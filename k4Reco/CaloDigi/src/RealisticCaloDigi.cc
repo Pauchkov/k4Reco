@@ -216,14 +216,15 @@ RealisticCaloDigi::integr_res_opt RealisticCaloDigi::StandardIntegration( const 
     float timei   = contribution.getTime(); //absolute hit timing of current subhit
     float energyi = contribution.getEnergy(); //energy of current subhit
     float relativetime = timei - timeCorrection; // wrt time of flight
-    if (relativetime>m_time_windowMin && relativetime<m_time_windowMax){
+    if (!m_time_apply || (relativetime>m_time_windowMin && relativetime<m_time_windowMax)){
       energySum += energyi;
       if (relativetime<earliestTime){
 	       earliestTime = relativetime; //use earliest hit time for simpletimingcut
       }
     }
   }
-  if(earliestTime > m_time_windowMin && earliestTime < m_time_windowMax){ //accept this hit
+  if(earliestTime != std::numeric_limits<float>::max() &&
+     (!m_time_apply || (earliestTime > m_time_windowMin && earliestTime < m_time_windowMax))){ //accept this hit
     return integr_res{SmearTime(earliestTime), energySum};
   }
   return std::nullopt;
